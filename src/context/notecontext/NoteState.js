@@ -1,106 +1,86 @@
 import { useState } from 'react';
 import NoteContext from './NoteContext';
 
+
 const NoteState = (props) => {
-    const notesInitial = [
-        {
-            "_id": "622caecf09a1b1f2d061269b",
-            "user": "622cae09511bca3cc5d9f734",
-            "title": "Wow",
-            "description": "No One",
-            "tag": "General",
-            "date": "1647095503425",
-            "__v": 0
-        },
-        {
-            "_id": "622caee109a1b1f2d061269d",
-            "user": "622cae09511bca3cc5d9f734",
-            "title": "Hello Google",
-            "description": "Voice Assistant Google",
-            "tag": "General",
-            "date": "1647095521454",
-            "__v": 0
-        },
-        {
-            "_id": "622caee209a1b1f2d061269f",
-            "user": "622cae09511bca3cc5d9f734",
-            "title": "Hello Google",
-            "description": "Voice Assistant Google",
-            "tag": "General",
-            "date": "1647095522444",
-            "__v": 0
-        },
-        {
-            "_id": "622caee209a1b1f2d06126a1",
-            "user": "622cae09511bca3cc5d9f734",
-            "title": "Hello Google",
-            "description": "Voice Assistant Google",
-            "tag": "General",
-            "date": "1647095522616",
-            "__v": 0
-        },
-        {
-            "_id": "622caee209a1b1f2d06126a3",
-            "user": "622cae09511bca3cc5d9f734",
-            "title": "Hello Google",
-            "description": "Voice Assistant Google",
-            "tag": "General",
-            "date": "1647095522761",
-            "__v": 0
-        },
-        {
-            "_id": "622caee209a1b1f2d06126a5",
-            "user": "622cae09511bca3cc5d9f734",
-            "title": "Hello Google",
-            "description": "Voice Assistant Google",
-            "tag": "General",
-            "date": "1647095522901",
-            "__v": 0
-        },
-        {
-            "_id": "622caee309a1b1f2d06126a7",
-            "user": "622cae09511bca3cc5d9f734",
-            "title": "Hello Google",
-            "description": "Voice Assistant Google",
-            "tag": "General",
-            "date": "1647095523053",
-            "__v": 0
-        },
-        {
-            "_id": "622caee309a1b1f2d06126a9",
-            "user": "622cae09511bca3cc5d9f734",
-            "title": "Hello Google",
-            "description": "Voice Assistant Google",
-            "tag": "General",
-            "date": "1647095523197",
-            "__v": 0
-        },
-        {
-            "_id": "622caee309a1b1f2d06126ab",
-            "user": "622cae09511bca3cc5d9f734",
-            "title": "Hello Google",
-            "description": "Voice Assistant Google",
-            "tag": "General",
-            "date": "1647095523344",
-            "__v": 0
-        },
-        {
-            "_id": "622caee309a1b1f2d06126af",
-            "user": "622cae09511bca3cc5d9f734",
-            "title": "Hello Google",
-            "description": "Voice Assistant Google",
-            "tag": "General",
-            "date": "1647095523678",
-            "__v": 0
-        }
-    ]
-    const [notes, setnotes] = useState(notesInitial);
+  const url = "http://localhost:5000";
+  const notesInitial = [];  
+  
 
-    
+  const [notes, setNotes] = useState(notesInitial);
 
-    return (<NoteContext.Provider value={{ notes, setnotes }}>
-        {props.children}
-    </NoteContext.Provider>)
+
+  const getNotes = async () => {
+    const response = await fetch(`${url}/api/notes/fetchAllNotes`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('token')
+      },
+    });
+    const json = await response.json();
+    setNotes(json);
+  }
+
+
+  const addNote = async (title, description, tag) => {
+    const response = await fetch(`${url}/api/notes/createnote/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('token')
+      },
+      body: JSON.stringify({ title, description, tag })
+    });
+    const json = await response.json();
+    setNotes(notes.concat(json));
+  }
+
+  const deleteNote = async (id) => {
+    const response = await fetch(`${url}/api/notes/delete/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('token')
+      },
+    });
+    const json = await response.json();
+    setNotes(json);
+  }
+
+  const editNote = async (id, title, description, tag) => {
+    const response = await fetch(`${url}/api/notes/updatenote/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': localStorage.getItem('token')
+      },
+      body: JSON.stringify({ title, description, tag })
+    });
+    // const json = await response.json();
+
+    let newNotes = JSON.parse(JSON.stringify(notes))
+    // Logic to edit in client
+    for (let index = 0; index < newNotes.length; index++) {
+      const element = newNotes[index];
+      if (element._id === id) {
+        newNotes[index].title = title;
+        newNotes[index].description = description;
+        newNotes[index].tag = tag;
+        break;
+      }
+    }
+    setNotes(newNotes);
+  }
+
+  const authUser = ()=>{
+    const x = localStorage.getItem('token');
+    return x;
+  }
+  
+  return (<NoteContext.Provider value={{ notes, addNote, deleteNote, getNotes,editNote, authUser }}>
+    {props.children}
+  </NoteContext.Provider>)
 }
 
 export default NoteState;

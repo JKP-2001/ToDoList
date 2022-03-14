@@ -1,13 +1,20 @@
-import React,{useEffect} from 'react'
+import React, { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom';
-
+import {useNavigate} from 'react-router-dom'
 
 
 const Navbar = () => {
+    const Navigate = useNavigate();
     let location = useLocation();
     useEffect(() => {
         console.log(location.pathname);
     }, [location])
+
+    const handleLogout = ()=>{
+        localStorage.removeItem('token');
+        Navigate("/login");
+    }
+
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
             <Link className="navbar-brand" to="#">iNoteBook</Link>
@@ -18,16 +25,17 @@ const Navbar = () => {
             <div className="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul className="navbar-nav mr-auto">
                     <li className="nav-item">
-                        <Link className={`nav-link ${location.pathname==="/"?"active":""}`} to="/">Home <span className="sr-only">(current)</span></Link>
+                        <Link className={`nav-link ${location.pathname === "/" ? "active" : ""}`} to="/">Home <span className="sr-only">(current)</span></Link>
                     </li>
                     <li className="nav-item">
-                        <Link className={`nav-link ${location.pathname==="/about"?"active":""}`} to="/about">About</Link>
+                        <Link className={`nav-link ${location.pathname === "/about" ? "active" : ""}`} to="/about">About</Link>
                     </li>
                 </ul>
-                <form className="form-inline my-2 my-lg-0">
-                    <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" />
-                    <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                </form>
+                {localStorage.getItem('token')?
+                <button type="button" className="btn btn-primary" onClick={handleLogout}>Logout</button>:<form className="form-inline my-2 my-lg-0">
+                    <Link className="btn btn-primary mx-2" to="/login" role="button">Login</Link>
+                    <Link className="btn btn-primary mx-2" to="/signup" role="button">SignUp</Link>
+                </form>}
             </div>
         </nav>
     )
