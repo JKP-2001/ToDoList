@@ -9,7 +9,6 @@ const { body, validationResult } = require("express-validator");
 router.get("/fetchAllNotes", fetchuser, async (req, res) => {
     try {
         const id = req.user.id;
-        console.log(id);
         const notes = await Notes.find({ user: id });
         res.json(notes);
     } catch (err) {
@@ -37,7 +36,8 @@ router.post("/createnote", [
             description: req.body.description,
             tag: req.body.tag,
         });
-        res.json(note);
+        const notes = await Notes.find({ user: req.user.id });
+        res.status(200).json(notes);
     } catch (err) {
         res.status(400).send(err.message);
     }
@@ -75,7 +75,8 @@ router.patch("/updatenote/:id", [
             }
             else {
                 const updatednote = await Notes.findByIdAndUpdate((req.params.id), { $set: newnote }, { new: true });
-                res.json(updatednote);
+                const notes = await Notes.find({ user: userid });
+                res.status(200).json(notes);
             }
         }
     } catch (err) {
@@ -102,7 +103,8 @@ router.delete("/delete/:id", fetchuser, async (req, res) => {
             }
             else {
                 const updatednote = await Notes.findByIdAndDelete((req.params.id));
-                res.status(200).json("Done");
+                const notes = await Notes.find({ user: userid });
+                res.status(200).json(notes);
             }
         }
     } catch (err) {
