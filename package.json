@@ -9,6 +9,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": "16.13.2"
+  },
   "dependencies": {
     "bcrypt": "^5.0.1",
     "concurrently": "^7.0.0",

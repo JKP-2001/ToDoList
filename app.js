@@ -14,7 +14,14 @@ app.get("/",(req,res)=>{
 app.use("/api/auth",require('./routes/auth.js'));
 app.use("/api/notes",require('./routes/notes.js'));
 
-app.listen(5000,(err)=>{
+let port = process.env.PORT;
+if (port == null || port == "") {
+  port = 5000;
+}
+
+
+
+app.listen(port,(err)=>{
     if(err){
         console.log(err);
     }
